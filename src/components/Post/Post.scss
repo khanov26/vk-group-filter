@@ -1,0 +1,45 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+
+.post {
+    margin-bottom: 1rem;
+
+    &__header {
+        display: flex;
+        align-items: center;
+    }
+
+    &__author {
+        &-avatar {
+            margin-right: 1rem;
+
+            img {
+                border-radius: 50%;
+            }
+        }
+
+        &-name {
+            display: block;
+            line-height: 1;
+        }
+    }
+
+    &__time {
+        font-size: 0.8rem;
+        color: $gray-600;
+    }
+
+    &__content {
+        margin-top: 1rem;
+    }
+
+    &__images {
+        display: flex;
+        flex-wrap: wrap;
+        margin: -.5rem;
+        
+        img {
+            margin: .5rem;
+        }
+    }
+}

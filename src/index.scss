@@ -1,0 +1,13 @@
+@import '~bootstrap/scss/bootstrap.scss';
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: $gray-200;
+}
+
+.block {
+    border: 1px solid $gray-500;
+    border-radius: 4px;
+    background-color: white;
+    padding: 1rem;
+}
