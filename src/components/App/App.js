@@ -132,7 +132,7 @@ class App extends Component {
             <main className="App">
                 <div className="container">
                     <div className="row">
-                        <aside className="col-lg-3 filters order-lg-2">
+                        <aside className="col-lg-3 filters align-self-start">
                             {this.isRequestSuccess
                                 ? <GroupInfo name={this.state.groupName} image={this.state.groupImage}/>
                                 : ''
@@ -143,7 +143,7 @@ class App extends Component {
                                      error={this.isRequestSuccess === false}
                             />
                         </aside>
-                        <div className="col-lg-9 mt-3 mt-lg-0 posts order-1">
+                        <div className="col-lg-9 mt-3 mt-lg-0 posts">
                             {this.state.posts &&
                             <PostList posts={this.state.posts} profiles={this.state.profiles}/>}
                         </div>

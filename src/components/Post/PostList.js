@@ -2,17 +2,11 @@ import React, {Component} from 'react';
 import Post from "./Post";
 
 export default class PostList extends Component {
-    static parseProfiles(profiles) {
-        let data = {};
-        for (let profile of profiles) {
-            data[profile.id] = profile;
-        }
-
-        return data;
-    }
-
     render() {
-        let profiles = PostList.parseProfiles(this.props.profiles);
+        let profiles = this.props.profiles.reduce((acc, cur) => {
+            acc[cur.id] = cur;
+            return acc;
+        }, {});
 
         return (
             <div>

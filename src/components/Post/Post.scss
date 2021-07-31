@@ -34,12 +34,12 @@
     }
 
     &__images {
-        display: flex;
-        flex-wrap: wrap;
-        margin: -.5rem;
-        
-        img {
-            margin: .5rem;
-        }
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+    }
+
+    &__image {
+        cursor: pointer;
     }
 }

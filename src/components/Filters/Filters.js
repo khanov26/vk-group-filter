@@ -23,7 +23,7 @@ export default class Filters extends Component {
         ];
         return (
             <div className="block filters">
-                <div class="form-group">
+                <div className="form-group">
                     <label htmlFor="group-link">Группа</label>
                     <input type="email"
                            className={groupLinkFieldClasses.filter(item => item !== "").join(" ")}
