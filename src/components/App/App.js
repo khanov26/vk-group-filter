@@ -18,12 +18,13 @@ class App extends Component {
             groupLink: null,
             groupName: null,
             groupImage: null,
-            posts: null,
-            profiles: null
+            posts: [],
+            profiles: []
         };
 
         this.handleGroupLinkChange = this.handleGroupLinkChange.bind(this);
         this.handleGroupLinkBlur = this.handleGroupLinkBlur.bind(this);
+        this.getPosts = this.getPosts.bind(this);
     }
 
     handleGroupLinkChange(value) {
@@ -37,19 +38,17 @@ class App extends Component {
             return;
         }
 
-        let groupScreenName = this.getGroupScreenName(groupLink);
+        this.groupScreenName = this.getGroupScreenName(groupLink);
 
-        if (groupScreenName === this.lastGroupScreenName) {
+        if (this.groupScreenName === this.lastGroupScreenName) {
             return;
         }
 
-        let {isRequestSuccess, name: groupName, image: groupImage} = await this.getGroupInfo(groupScreenName);
+        let {isRequestSuccess, name: groupName, image: groupImage} = await this.getGroupInfo(this.groupScreenName);
         this.isRequestSuccess = isRequestSuccess;
-        this.lastGroupScreenName = groupScreenName;
+        this.lastGroupScreenName = this.groupScreenName;
         this.setState({groupName, groupImage});
-
-        let {posts, profiles} = await this.getPosts(groupScreenName);
-        this.setState({posts, profiles});
+        await this.getPosts(0);
     }
 
     async getGroupInfo(screenName) {
@@ -78,19 +77,25 @@ class App extends Component {
         };
     }
 
-    async getPosts(groupScreenName) {
-        let response = await this.vk.call('wall.get', {
-            domain: groupScreenName,
-            count: 10,
-            extended: 1,
-        });
+    async getPosts(page) {
+        if (this.isRequestSuccess) {
+            const postsPerPage = 10;
+            let response = await this.vk.call('wall.get', {
+                domain: this.groupScreenName,
+                count: 10,
+                extended: 1,
+                filter: "others",
+                offset: page * postsPerPage,
+            });
 
-        if (response.response) {
-            let {items:posts, profiles} = response.response;
-            return {posts, profiles};
+            if (response.response) {
+                let {items: posts, profiles} = response.response;
+                this.setState({
+                    posts: this.state.posts.concat(posts),
+                    profiles: this.state.profiles.concat(profiles),
+                });
+            }
         }
-
-        return null;
     }
 
     init() {
@@ -99,8 +104,8 @@ class App extends Component {
 
         if (!token || expires < Date.now()) {
             if (window.location.href.includes("access_token")) {
-                token = this.parseURL("access_token", window.location.href);
-                expires = +this.parseURL("expires_in", window.location.href) * 1000 + Date.now();
+                token = App.parseURL("access_token", window.location.href);
+                expires = +App.parseURL("expires_in", window.location.href) * 1000 + Date.now();
                 window.localStorage.setItem("token", token);
                 window.localStorage.setItem("expires", expires);
                 this.vk = new VK({token: token});
@@ -121,7 +126,7 @@ class App extends Component {
         return link;
     }
 
-    parseURL(needle, subject) {
+    static parseURL(needle, subject) {
         let regex = new RegExp(`${needle}=([^&]+)`);
         let result = subject.match(regex);
         return result[1] || null;
@@ -132,7 +137,7 @@ class App extends Component {
             <main className="App">
                 <div className="container">
                     <div className="row">
-                        <aside className="col-lg-3 filters align-self-start">
+                        <aside className="col-lg-3 align-self-start">
                             {this.isRequestSuccess
                                 ? <GroupInfo name={this.state.groupName} image={this.state.groupImage}/>
                                 : ''
@@ -144,8 +149,8 @@ class App extends Component {
                             />
                         </aside>
                         <div className="col-lg-9 mt-3 mt-lg-0 posts">
-                            {this.state.posts &&
-                            <PostList posts={this.state.posts} profiles={this.state.profiles}/>}
+                            {this.state.posts.length !== 0 &&
+                            <PostList posts={this.state.posts} profiles={this.state.profiles} getPosts={this.getPosts}/>}
                         </div>
                     </div>
                 </div>

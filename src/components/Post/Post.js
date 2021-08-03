@@ -67,7 +67,7 @@ export default class Post extends Component {
                         {this.postPhotos.map(
                             attachmentItem =>
                                 <img src={Post.getThumbnail(attachmentItem.photo.sizes, {width: 150})} alt=""
-                                     data-origin={Post.getOriginalImage(attachmentItem.photo.sizes)} className="post_image"/>
+                                     data-origin={Post.getOriginalImage(attachmentItem.photo.sizes)} className="post__image"/>
                                 )
                         }
                     </div>
