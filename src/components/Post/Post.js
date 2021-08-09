@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './Post.scss';
 import 'viewerjs/dist/viewer.css';
 import Viewer from 'viewerjs';
+import linkIcon from '../../icons/foreign.svg';
 
 export default class Post extends Component {
     componentDidMount() {
@@ -46,17 +47,20 @@ export default class Post extends Component {
             <article id={"post-" + this.props.post.id} className="block post">
                 {this.props.profile &&
                 <header className="post__header">
-                    <a href={"http://vk.com/" + this.props.profile.screen_name} className="post__author-avatar">
+                    <a href={"https://vk.com/" + this.props.profile.screen_name} className="post__author-avatar" target={"blank"}>
                         <img src={this.props.profile.photo_50} alt="post-author-avatar"/>
                     </a>
                     <div>
-                        <a href={"http://vk.com/" + this.props.profile.screen_name} className="post__author-name">
+                        <a href={"https://vk.com/" + this.props.profile.screen_name} className="post__author-name" target={"blank"}>
                             {this.props.profile.first_name} {this.props.profile.last_name}
                         </a>
                         <span className="post__time">
                             {new Date(this.props.post.date * 1000).toLocaleString()}
                         </span>
                     </div>
+                    <a href={`https://vk.com/wall${this.props.post.owner_id}_${this.props.post.id}`} className="post__link" target="blank">
+                        <img src={linkIcon} alt="" className="post__link-icon"/>
+                    </a>
                 </header>
                 }
                 <div className="post__content">

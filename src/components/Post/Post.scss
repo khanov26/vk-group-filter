@@ -29,18 +29,29 @@
         color: $gray-600;
     }
 
+    &__link {
+        align-self: flex-start;
+        margin-left: auto;
+    }
+
+    &__link-icon {
+        width: 15px;
+    }
+
     &__content {
         margin-top: 1rem;
     }
 
     &__images {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 10px;
     }
 
     &__image {
-        max-width: 100%;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
         cursor: pointer;
     }
 }
