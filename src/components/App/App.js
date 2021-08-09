@@ -44,8 +44,14 @@ class App extends Component {
             return;
         }
 
-        let {isRequestSuccess, name: groupName, image: groupImage} = await this.getGroupInfo(this.groupScreenName);
-        this.isRequestSuccess = isRequestSuccess;
+        let groupInfo = await this.getGroupInfo(this.groupScreenName);
+        if (!groupInfo.isSuccess) {
+            this.isRequestSuccess = false;
+            return;
+        }
+
+        let {name: groupName, image: groupImage} = await this.getGroupInfo(this.groupScreenName);
+        this.isRequestSuccess = true;
         this.lastGroupScreenName = this.groupScreenName;
         this.setState({groupName, groupImage});
         await this.getPosts(0);
@@ -56,25 +62,15 @@ class App extends Component {
             group_id: screenName
         });
 
-
-        let isRequestSuccess;
-        let name;
-        let image;
-
-        if (response.response) {
-            isRequestSuccess = true;
-            ({name, photo_200: image} = response.response[0]);
-        } else {
-            isRequestSuccess = false;
-            name = null;
-            image = null;
+        if (response.isSuccess) {
+            return {
+                isSuccess: true,
+                name: response.data[0].name,
+                image: response.data[0].photo_200
+            }
         }
 
-        return {
-            isRequestSuccess,
-            name,
-            image
-        };
+        return response;
     }
 
     async getPosts(page) {
@@ -88,8 +84,8 @@ class App extends Component {
                 offset: page * postsPerPage,
             });
 
-            if (response.response) {
-                let {items: posts, profiles} = response.response;
+            if (response.isSuccess) {
+                let {items: posts, profiles} = response.data;
                 this.setState({
                     posts: this.state.posts.concat(posts),
                     profiles: this.state.profiles.concat(profiles),
@@ -99,22 +95,7 @@ class App extends Component {
     }
 
     init() {
-        let token = window.localStorage.getItem("token");
-        let expires = window.localStorage.getItem("expires");
-
-        if (!token || expires < Date.now()) {
-            if (window.location.href.includes("access_token")) {
-                token = App.parseURL("access_token", window.location.href);
-                expires = +App.parseURL("expires_in", window.location.href) * 1000 + Date.now();
-                window.localStorage.setItem("token", token);
-                window.localStorage.setItem("expires", expires);
-                this.vk = new VK({token: token});
-            } else {
-                this.vk = new VK({appId: "7820044"});
-            }
-        } else {
-            this.vk = new VK({token: token});
-        }
+        this.vk = new VK({appId: "7922207"});
     }
 
     getGroupScreenName(link) {
@@ -126,18 +107,12 @@ class App extends Component {
         return link;
     }
 
-    static parseURL(needle, subject) {
-        let regex = new RegExp(`${needle}=([^&]+)`);
-        let result = subject.match(regex);
-        return result[1] || null;
-    }
-
     render() {
         return (
             <main className="App">
                 <div className="container">
                     <div className="row">
-                        <aside className="col-lg-3 align-self-start">
+                        <aside className="col-lg-3 align-self-start aside">
                             {this.isRequestSuccess
                                 ? <GroupInfo name={this.state.groupName} image={this.state.groupImage}/>
                                 : ''

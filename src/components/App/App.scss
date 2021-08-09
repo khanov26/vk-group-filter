@@ -1,8 +1,13 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+
 .App {
     padding: 1rem;
 }
 
-aside {
-    position: sticky;
-    top: 16px;
+@media screen and (min-width: map_get($grid-breakpoints, 'lg')) {
+    .aside {
+        position: sticky;
+        top: 16px;
+    }
 }
