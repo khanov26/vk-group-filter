@@ -19,12 +19,49 @@ class App extends Component {
             groupName: null,
             groupImage: null,
             posts: [],
-            profiles: []
+            profiles: [],
+            postFilters: {
+                withPhotoOnly: {
+                    active: false,
+                    func: post => {
+                        if (!post.attachments) return false;
+
+                        const photos = post.attachments.filter(attachmentItem => attachmentItem.type === "photo");
+                        return photos.length !== 0;
+                    },
+                }
+            }
         };
 
         this.handleGroupLinkChange = this.handleGroupLinkChange.bind(this);
         this.handleGroupLinkBlur = this.handleGroupLinkBlur.bind(this);
         this.getPosts = this.getPosts.bind(this);
+        this.handlePostFiltersChanges = this.handlePostFiltersChanges.bind(this);
+    }
+
+    handlePostFiltersChanges(filterName, isActive) {
+        const postFilters = {...this.state.postFilters};
+        postFilters[filterName].active = isActive;
+        this.setState({
+            postFilters,
+            posts: [],
+            profiles: []
+        });
+
+        this.getPosts(0);
+    }
+
+    getActiveFilters() {
+        let activeFiltersFunctions = [];
+        const postFilters = this.state.postFilters;
+        for (let filterName in postFilters) {
+            const currentFilter = postFilters[filterName];
+            if (currentFilter.active) {
+                activeFiltersFunctions.push(currentFilter.func);
+            }
+        }
+
+        return activeFiltersFunctions;
     }
 
     handleGroupLinkChange(value) {
@@ -50,10 +87,14 @@ class App extends Component {
             return;
         }
 
-        let {name: groupName, image: groupImage} = await this.getGroupInfo(this.groupScreenName);
+        let {name: groupName, image: groupImage} = groupInfo;
         this.isRequestSuccess = true;
         this.lastGroupScreenName = this.groupScreenName;
-        this.setState({groupName, groupImage});
+        this.setState({
+            groupName,
+            groupImage,
+            posts: [],
+        });
         await this.getPosts(0);
     }
 
@@ -75,10 +116,10 @@ class App extends Component {
 
     async getPosts(page) {
         if (this.isRequestSuccess) {
-            const postsPerPage = 10;
+            const postsPerPage = 50;
             let response = await this.vk.call('wall.get', {
                 domain: this.groupScreenName,
-                count: 10,
+                count: postsPerPage,
                 extended: 1,
                 filter: "others",
                 offset: page * postsPerPage,
@@ -86,6 +127,12 @@ class App extends Component {
 
             if (response.isSuccess) {
                 let {items: posts, profiles} = response.data;
+
+                const activeFilters = this.getActiveFilters();
+                for (let currentFilter of activeFilters) {
+                    posts = posts.filter(currentFilter);
+                }
+
                 this.setState({
                     posts: this.state.posts.concat(posts),
                     profiles: this.state.profiles.concat(profiles),
@@ -121,6 +168,8 @@ class App extends Component {
                                      onGroupLinkChange={this.handleGroupLinkChange}
                                      onGroupLinkBlur={this.handleGroupLinkBlur}
                                      error={this.isRequestSuccess === false}
+                                     filters={this.state.postFilters}
+                                     onChange={this.handlePostFiltersChanges}
                             />
                         </aside>
                         <div className="col-lg-9 mt-3 mt-lg-0 posts">

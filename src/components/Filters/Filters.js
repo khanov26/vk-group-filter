@@ -4,16 +4,22 @@ export default class Filters extends Component {
     constructor(props) {
         super(props);
 
-        this.handleBlur = this.handleBlur.bind(this);
-        this.handleChange = this.handleChange.bind(this);
+        this.handleGroupLinkBlur = this.handleGroupLinkBlur.bind(this);
+        this.handleGroupLinkChange = this.handleGroupLinkChange.bind(this);
+        this.handleWithPhotoOnlyFilterChange = this.handleWithPhotoOnlyFilterChange.bind(this);
     }
 
-    handleBlur(e) {
+    handleGroupLinkBlur(e) {
         this.props.onGroupLinkBlur(e.target.value);
     }
 
-    handleChange(e) {
+    handleGroupLinkChange(e) {
         this.props.onGroupLinkChange(e.target.value);
+    }
+
+    handleWithPhotoOnlyFilterChange(e) {
+        const checked = e.target.checked;
+        this.props.onChange("withPhotoOnly", checked);
     }
 
     render() {
@@ -25,12 +31,27 @@ export default class Filters extends Component {
             <div className="block filters">
                 <div className="form-group">
                     <label htmlFor="group-link">Группа</label>
-                    <input type="email"
+                    <input type="text"
+                           autoFocus={true}
                            className={groupLinkFieldClasses.filter(item => item !== "").join(" ")}
                            placeholder="Укажите url группы"
-                           value={this.props.groupLink} onBlur={this.handleBlur} onChange={this.handleChange}/>
+                           value={this.props.groupLink}
+                           onBlur={this.handleGroupLinkBlur}
+                           onChange={this.handleGroupLinkChange}/>
                     {this.props.error &&
                     <small className="form-text text-danger">Введите правильный url группы</small>}
+                </div>
+
+                <hr/>
+
+                <div className="form-check">
+                    <input type="checkbox"
+                           className="form-check-input"
+                           id="with-photo"
+                           checked={this.props.filters.withPhotoOnly.active}
+                           onChange={this.handleWithPhotoOnlyFilterChange}
+                    />
+                    <label htmlFor="with-photo" className="form-check-label">только с фотографиями</label>
                 </div>
             </div>
         );

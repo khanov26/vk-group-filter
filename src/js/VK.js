@@ -17,9 +17,6 @@ export default class VK {
             if (!token || expires < Date.now()) {
                 let authWindow = this.auth();
 
-                authWindow.onload = () => {
-                };
-
                 let authCheck = () => {
                     if (authWindow.closed) {
                         clearTimeout(timerId);
